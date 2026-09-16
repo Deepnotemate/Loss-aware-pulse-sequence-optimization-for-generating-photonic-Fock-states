@@ -1,0 +1,16 @@
+{
+    "Omega": 1.0,
+    "dim": 60,
+    "cutoff": 3,
+    "dt_val": 0.025,
+    "loss_type": "atom",
+    "gamma": 0.05,
+    "target_N": 1,
+    "num_iterations": 500,
+    "hyperparams_Adam": [
+        0.9,
+        0.999,
+        0.05
+    ],
+    "stopping_cond": 0.003
+}
