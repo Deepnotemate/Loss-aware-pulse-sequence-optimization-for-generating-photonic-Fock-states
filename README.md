@@ -35,7 +35,8 @@ The repository is divided into two independent modules:
 │   │   ├── plot_highest_fidelities.py   # Fig. 2: optimal fidelities vs. pulse number
 │   │   ├── plot_optimization_landscape.py # Fig. 4: optimization landscape
 │   │   ├── plot_state_trafos.py         # Fig. 3: composite state populations
-│   │   └── plot_convergence_curve.py    # Fig. 9: final fidelities and convergence of best GD run
+│   │   ├── plot_convergence_curve.py    # Fig. 9: final fidelities and fidelity-convergence of the best GD run (fixed-phase optimization)
+│   │   └── plot_phase_convergence.py    # Fig. 10: final fidelities and phase-parameter convergence (free-phase optimization)
 │   ├── data/
 │   │   ├── auxiliary/optimization_results/  # Raw optimization output (all GD runs)
 │   │   └── manuscript/                      # Processed data used in figures
@@ -50,7 +51,7 @@ The repository is divided into two independent modules:
     │   └── scan_dissipation_rates.py # Scan fidelity over a range of decay rates  
     ├── plotting/
     │   ├── plot_dynamics.py          # Figs. 6, 7: time evolution of composite state populations
-    │   └── plot_dissipation_rate_scan.py # Fig. 5, 8: fidelity vs. dissipation rate
+    │   └── plot_dissipation_rate_scan.py # Figs. 5, 8: fidelity vs. dissipation rate
     ├── data/
     │   ├── auxiliary/                # Raw optimization output
     │   └── manuscript/               # Optimal parameters and processed data used in figures
@@ -79,7 +80,7 @@ Scripts marked **(cluster)** were run on an HPC cluster to parallelize many inde
 
 | # | Script | What it does | Run |
 |---|--------|---------------|-----|
-| 1 | `src/run_optimization.py` (cluster) | GD optimization for one `(p, N)` combination; saves fidelities/parameters for each run to `data/auxiliary/optimization_results/`. | `python run_optimization.py p=4 N=2` |
+| 1 | `src/run_optimization.py` (cluster, edit config) | GD optimization for one `(p, N)` combination; saves fidelities/parameters for each run to `data/auxiliary/optimization_results/`. | Set `optimize_phases` (fixed vs. randomly initialized phases), `save_probs_histories` and `save_params_histories` (full per-iteration history vs. final values only) in the script's `Configuration` section. Then run `python run_optimization.py p=4 N=2` |
 | 2 | `src/convergence_testing.py` (edit config) | Checks Fock-space truncation convergence for the best runs; saves the optimal parameter set to `data/manuscript/optimal_configurations/`. | set `p`, `target_N`, `num_tests`, then `python convergence_testing.py` |
 | 3 | `src/optimization_landscape.py` (edit config) | Computes fidelity-landscape slices around the optimum; saves to `data/manuscript/optimization_landscape/`. | set `p_in`, `N_in`, then `python optimization_landscape.py` |
 | 4 | `src/state_transformations.py` (edit config) | Computes the state evolution through the pulse sequence; saves to `data/manuscript/state_transformations/`. | set `p_in`, `N_in`, then `python state_transformations.py` |
@@ -87,13 +88,14 @@ Scripts marked **(cluster)** were run on an HPC cluster to parallelize many inde
 | 6 | `plotting/plot_optimization_landscape.py` | Fig. 4 — optimization landscape. | `python plot_optimization_landscape.py` |
 | 7 | `plotting/plot_state_trafos.py` | Fig. 3 — composite state populations. | `python plot_state_trafos.py` |
 | 8 | `plotting/plot_convergence_curve.py` | Fig. 9 — sorted final fidelities across all initializations and the infidelity convergence of the best GD run. | `python plot_convergence_curve.py` |
+| 9 | `plotting/plot_phase_convergence.py` | Fig. 10 — sorted final fidelities highlighting runs that converged to a binary (0 or π) phase-difference pattern, plus the phase-parameter trajectories of a selected run. | `python plot_phase_convergence.py` (requires `run_optimization.py` to have run with `optimize_phases = True`) |
 
 ### Loss-aware optimization
 
 | # | Script | What it does | Run |
 |---|--------|---------------|-----|
 | 1 | `src/run_optimization.py` (cluster, edit config) | Loss-aware GD for a given `loss_type`, `gamma`, `target_N`; writes results and the optimization settings (`settings.json`) to `data/auxiliary/optimization_results/{loss_type}_decay_N={N}_gamma={gamma}/`. | Configure the optimization hyperparameters in the script's `Configuration` section, then run `python run_optimization.py --init_idx 0` (use different `--init_idx` values for parallel runs). |
-| 2 | `src/evaluate_results.py` (edit config) | Ranks runs by fidelity, prints the best parameters, and saves them to `data/manuscript/optimal_parameters/`; creates auxiliary evaluation plot.| set `loss_type`, `N`, `gamma`, then `python evaluate_results.py` |
+| 2 | `src/evaluate_results.py` (edit config) | Ranks runs by fidelity, prints the best parameters, and saves them to `data/manuscript/optimal_parameters/`; creates auxiliary evaluation plot. | set `loss_type`, `N`, `gamma`, then `python evaluate_results.py` |
 | 3 | `src/compute_dynamics.py` (edit config) | Computes time evolution for the optimal loss-aware and optimal unitary parameters, respectively; saves to `data/manuscript/composite_state_dynamics/`. | Configure the simulation parameters in the script's `Configuration` section, then run `python compute_dynamics.py`. |
 | 4 | `src/scan_dissipation_rates.py` (edit config) | Scans fidelity over a range of decay rates; saves to `data/manuscript/dissipation_rate_scans/`. | Configure the simulation parameters in the script's `Configuration` section, then run `python scan_dissipation_rates.py`. |
 | 5 | `plotting/plot_dynamics.py` | Figs. 6, 7 — state-population dynamics; prints fidelity after last pulse. | Set `loss_type` in the script's `Configuration` section, then run `python plot_dynamics.py` |

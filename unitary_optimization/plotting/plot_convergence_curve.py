@@ -9,11 +9,13 @@ import os
 
 p        = 4      # pulse number (4, 5, or 6)
 target_N = 2      # Fock state |N⟩
-DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'auxiliary', 'optimization_results')
+DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data', 'manuscript', 'optimization_histories')
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # LOAD DATA
+#   Requires run_optimization.py to have been run with save_probs_histories = True
+#   (saves per-iteration histories to data/manuscript/optimization_histories).
 #   fin_Probs    : final fidelity of each of the 100 runs  — shape (100,)
 #   best_history : full fidelity history of the best run   — shape (iterations,)
 # ─────────────────────────────────────────────────────────────────────────────
